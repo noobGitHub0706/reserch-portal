@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { serverTimestamp } from 'firebase/firestore';
 import StickyButton from '../components/StickyButton';
 
-const GAME_URL = import.meta.env.VITE_GAME_URL || 'https://game.example.com';
+const GAME_URL = import.meta.env.VITE_GAME_URL || 'https://noobgithub0706.github.io/infodemic-survivor/';
 
 export default function GameRedirectPage({ participant, saveData, updateStatus }) {
     const [loading, setLoading] = useState(false);
