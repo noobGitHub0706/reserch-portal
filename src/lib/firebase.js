@@ -1,15 +1,14 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
-console.log('PROJECT_ID:', import.meta.env.VITE_FIREBASE_PROJECT_ID);
-
+// TODO: 動作確認後、環境変数に戻すこと
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    apiKey: "AIzaSyDbhLrj7jIvfDkdbdVShqJqTfdqfSZ5vII",
+    authDomain: "infodemic-chronicle.firebaseapp.com",
+    projectId: "infodemic-chronicle",
+    storageBucket: "infodemic-chronicle.firebasestorage.app",
+    messagingSenderId: "605886051102",
+    appId: "1:605886051102:web:7e95134a8e55e294d50f0f",
 };
 
 const app = initializeApp(firebaseConfig);
