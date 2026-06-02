@@ -122,11 +122,31 @@ export function useParticipant() {
         });
     }, []);
 
+    // Update arbitrary root-level fields on the participant document
+    const updateParticipant = useCallback(async (fields) => {
+        setParticipant(prev => {
+            if (!prev) return prev;
+
+            if (!DEV_MODE || firebaseOk.current) {
+                updateDoc(doc(db, 'participants', prev.id), fields)
+                    .then(() => devLog('updateParticipant: 完了', fields))
+                    .catch(e => {
+                        if (DEV_MODE) { firebaseOk.current = false; devWarn('updateParticipant失敗', e); }
+                        else console.error(e);
+                    });
+            } else {
+                devLog('updateParticipant: Firebase スキップ', fields);
+            }
+
+            return { ...prev, ...fields };
+        });
+    }, []);
+
     const resetParticipant = useCallback(() => {
         setParticipant(null);
         setError(null);
         firebaseOk.current = true;
     }, []);
 
-    return { participant, loading, error, load, create, updateStatus, saveData, resetParticipant };
+    return { participant, loading, error, load, create, updateStatus, updateParticipant, saveData, resetParticipant };
 }

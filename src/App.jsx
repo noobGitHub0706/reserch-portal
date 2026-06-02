@@ -18,7 +18,7 @@ const PHASE_PARAM  = URL_PARAMS.get('phase'); // 'postTest' when returning from 
 const TOTAL_STEPS = 7;
 
 function getStep(status, condition, phaseParam) {
-    // Intervention step: control group or returning from game → post-test
+    // Returning from game or control group finishing placebo → post-test
     if (status === 'intervention' && (condition === 'control' || phaseParam === 'postTest')) {
         return 5;
     }
@@ -38,7 +38,7 @@ function statusLabel(status) {
         consent:      'デモグラフィクス回答中',
         demographics: '事前テスト回答中',
         preTest:      '課題実施中',
-        intervention: '事後テスト回答中',
+        intervention: '課題実施中',
         postTest:     '最終アンケート回答中',
         survey:       '完了',
         complete:     '完了',
@@ -120,19 +120,16 @@ function ResumeDialog({ participant, onResume, onFresh }) {
 
 // ══════════════════════════════════════════════════════════════════════════
 export default function App() {
-    // uiState: 'checking' | 'resume' | 'consent' | 'active' | 'error'
     const [uiState, setUiState] = useState('checking');
 
     const {
         participant, loading, error,
-        load, create, updateStatus, saveData, resetParticipant,
+        load, create, updateStatus, updateParticipant, saveData, resetParticipant,
     } = useParticipant();
 
-    // ── Init: check URL param (game redirect) or localStorage ─────────────
     useEffect(() => {
         async function init() {
             if (URL_ID) {
-                // Returning from game: load by URL ID
                 const data = await load(URL_ID);
                 if (data) {
                     localStorage.setItem('participantId', URL_ID);
@@ -149,7 +146,6 @@ export default function App() {
                 if (data) {
                     setUiState('resume');
                 } else {
-                    // Not found in Firestore (maybe deleted / dev cleanup)
                     localStorage.removeItem('participantId');
                     setUiState('consent');
                 }
@@ -161,7 +157,6 @@ export default function App() {
         init();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // ── Consent completion: assignCondition generates ID + condition ───────
     const handleConsentComplete = useCallback(async () => {
         const { id, condition, testSetOrder } = await assignCondition();
         localStorage.setItem('participantId', id);
@@ -169,7 +164,6 @@ export default function App() {
         setUiState('active');
     }, [create]);
 
-    // ── Resume dialog handlers ─────────────────────────────────────────────
     const handleResume = useCallback(() => setUiState('active'), []);
     const handleFresh  = useCallback(() => {
         localStorage.removeItem('participantId');
@@ -177,7 +171,6 @@ export default function App() {
         setUiState('consent');
     }, [resetParticipant]);
 
-    // ── Render ─────────────────────────────────────────────────────────────
     if (uiState === 'checking' || loading) {
         return (
             <Layout>
@@ -245,8 +238,7 @@ export default function App() {
                     ? (
                         <GameRedirectPage
                             participant={participant}
-                            saveData={saveData}
-                            updateStatus={updateStatus}
+                            onUpdate={updateParticipant}
                         />
                     ) : (
                         <PlaceboPage
@@ -266,14 +258,12 @@ export default function App() {
                         />
                     );
                 }
-                // Experimental still playing
+                // Experimental: handles both pending (initial) and redirected (came back without postTest param)
                 return (
-                    <div style={{ textAlign: 'center', paddingTop: '40px' }}>
-                        <p style={{ color: '#888', lineHeight: '1.8' }}>ゲームプレイ中です。</p>
-                        <p style={{ color: '#bbb', fontSize: '14px', marginTop: '8px' }}>
-                            課題が完了すると自動的に次のステップに進みます。
-                        </p>
-                    </div>
+                    <GameRedirectPage
+                        participant={participant}
+                        onUpdate={updateParticipant}
+                    />
                 );
 
             case 'postTest':
