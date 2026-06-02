@@ -17,13 +17,13 @@ export default function ConsentPage({ onComplete }) {
                 研究へのご協力のお願い
             </h2>
             <p style={{ marginBottom: '20px', lineHeight: '1.7' }}>
-                本研究は、SNS上の健康情報に関する判断力について調査するものです。
+                本研究は、SNS上の情報に関する判断力について調査するものです。
             </p>
 
             <div style={{ backgroundColor: '#f7f7f7', padding: '20px 24px', borderRadius: '8px', marginBottom: '28px' }}>
                 <h3 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '12px' }}>【研究概要】</h3>
                 <ul style={{ paddingLeft: '20px', lineHeight: '2.2' }}>
-                    <li>所要時間: 約40〜50分（テスト約15分 + 課題約20〜30分）</li>
+                    <li>所要時間: 約10〜20分（テスト約10分 + 課題約10分）</li>
                     <li>内容: アンケート、情報判断テスト、Web上の課題</li>
                     <li>データの取り扱い: 匿名化して統計的に処理されます</li>
                     <li>参加は任意であり、いつでも中断できます</li>
