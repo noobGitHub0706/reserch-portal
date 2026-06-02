@@ -4,7 +4,6 @@ import { assignCondition } from './lib/assignCondition';
 import ProgressBar from './components/ProgressBar';
 import ConsentPage from './pages/ConsentPage';
 import DemographicsPage from './pages/DemographicsPage';
-import MediatorPage from './pages/MediatorPage';
 import TestPage from './pages/TestPage';
 import GameRedirectPage from './pages/GameRedirectPage';
 import PlaceboPage from './pages/PlaceboPage';
@@ -14,36 +13,32 @@ import CompletePage from './pages/CompletePage';
 // URL params are fixed at load time for this SPA
 const URL_PARAMS   = new URLSearchParams(window.location.search);
 const URL_ID       = URL_PARAMS.get('id');    // set by game redirect
-const PHASE_PARAM  = URL_PARAMS.get('phase'); // 'postMediator' when returning from game
+const PHASE_PARAM  = URL_PARAMS.get('phase'); // 'postTest' when returning from game
 
-const TOTAL_STEPS = 9;
+const TOTAL_STEPS = 7;
 
 function getStep(status, condition, phaseParam) {
-    // Intervention step: if control group or returning from game → post-mediator page
-    if (status === 'intervention' && (condition === 'control' || phaseParam === 'postMediator')) {
-        return 6;
+    // Intervention step: control group or returning from game → post-test
+    if (status === 'intervention' && (condition === 'control' || phaseParam === 'postTest')) {
+        return 5;
     }
     return {
         consent:      2,
         demographics: 3,
-        preMediator:  4,
-        preTest:      5,
-        intervention: 5,
-        postMediator: 7,
-        postTest:     8,
-        survey:       9,
-        complete:     9,
+        preTest:      4,
+        intervention: 4,
+        postTest:     6,
+        survey:       7,
+        complete:     7,
     }[status] ?? 1;
 }
 
 function statusLabel(status) {
     return {
         consent:      'デモグラフィクス回答中',
-        demographics: '事前アンケート回答中',
-        preMediator:  '事前テスト回答中',
+        demographics: '事前テスト回答中',
         preTest:      '課題実施中',
-        intervention: '事後アンケート回答中',
-        postMediator: '事後テスト回答中',
+        intervention: '事後テスト回答中',
         postTest:     '最終アンケート回答中',
         survey:       '完了',
         complete:     '完了',
@@ -166,10 +161,9 @@ export default function App() {
         init();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // ── Consent completion: generate ID, assign condition, create doc ──────
+    // ── Consent completion: assignCondition generates ID + condition ───────
     const handleConsentComplete = useCallback(async () => {
-        const id = `IC-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
-        const { condition, testSetOrder } = await assignCondition();
+        const { id, condition, testSetOrder } = await assignCondition();
         localStorage.setItem('participantId', id);
         await create(id, condition, testSetOrder);
         setUiState('active');
@@ -238,17 +232,6 @@ export default function App() {
 
             case 'demographics':
                 return (
-                    <MediatorPage
-                        timing="pre"
-                        onComplete={async (data) => {
-                            await saveData('preMediator', data);
-                            await updateStatus('preMediator');
-                        }}
-                    />
-                );
-
-            case 'preMediator':
-                return (
                     <TestPage
                         timing="pre"
                         participant={participant}
@@ -273,16 +256,13 @@ export default function App() {
                     );
 
             case 'intervention':
-                // Control group finishes placebo → show post-mediator directly
-                // Experimental group returns from game with ?phase=postMediator → show post-mediator
-                if (condition === 'control' || PHASE_PARAM === 'postMediator') {
+                if (condition === 'control' || PHASE_PARAM === 'postTest') {
                     return (
-                        <MediatorPage
+                        <TestPage
                             timing="post"
-                            onComplete={async (data) => {
-                                await saveData('postMediator', data);
-                                await updateStatus('postMediator');
-                            }}
+                            participant={participant}
+                            saveData={saveData}
+                            updateStatus={updateStatus}
                         />
                     );
                 }
@@ -294,16 +274,6 @@ export default function App() {
                             課題が完了すると自動的に次のステップに進みます。
                         </p>
                     </div>
-                );
-
-            case 'postMediator':
-                return (
-                    <TestPage
-                        timing="post"
-                        participant={participant}
-                        saveData={saveData}
-                        updateStatus={updateStatus}
-                    />
                 );
 
             case 'postTest':

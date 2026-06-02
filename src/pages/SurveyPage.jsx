@@ -14,6 +14,7 @@ const INITIAL_EXPERIMENTAL = {
     ch3_difficulty: null,
     mostDifficultTechnique: null,
     mostUsefulActivity: null,
+    ecologicalValidity: null,
     freeText: '',
 };
 
@@ -34,7 +35,8 @@ function isCompleteExperimental(f) {
         f.ch2_difficulty !== null &&
         f.ch3_difficulty !== null &&
         f.mostDifficultTechnique !== null &&
-        f.mostUsefulActivity !== null
+        f.mostUsefulActivity !== null &&
+        f.ecologicalValidity !== null
     );
 }
 
@@ -143,6 +145,15 @@ export default function SurveyPage({ participant, saveData, updateStatus }) {
                         value={form.mostUsefulActivity}
                         onChange={v => set('mostUsefulActivity', v)}
                     />
+                </div>
+
+                <div style={SECTION_DIVIDER}>
+                    <LikertScale id="ecologicalValidity"
+                        label="ゲーム中の投稿は、実際のSNSで見かける投稿に近いと感じましたか？"
+                        min={1} max={5}
+                        minLabel="全く感じない" maxLabel="非常に感じる"
+                        centerLabel="どちらとも言えない"
+                        value={form.ecologicalValidity} onChange={v => set('ecologicalValidity', v)} />
                 </div>
 
                 <div style={SECTION_DIVIDER}>

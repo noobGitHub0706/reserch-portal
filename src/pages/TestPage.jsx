@@ -49,7 +49,7 @@ export default function TestPage({ timing, participant, saveData, updateStatus }
     const [phase, setPhase] = useState('instruction'); // 'instruction' | 'test'
     const [currentIdx, setCurrentIdx] = useState(0);
     const [trustRating, setTrustRating] = useState(null);
-    const [actionIntent, setActionIntent] = useState(null);
+    const [shareIntent, setShareIntent] = useState(null);
     const [answers, setAnswers] = useState([]);
     const [displayedAt, setDisplayedAt] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -59,11 +59,11 @@ export default function TestPage({ timing, participant, saveData, updateStatus }
         if (phase === 'test') {
             setDisplayedAt(Date.now());
             setTrustRating(null);
-            setActionIntent(null);
+            setShareIntent(null);
         }
     }, [phase, currentIdx]);
 
-    const canProceed = trustRating !== null && actionIntent !== null;
+    const canProceed = trustRating !== null && shareIntent !== null;
     const isLast = currentIdx === questions.length - 1;
 
     const handleNext = async () => {
@@ -72,7 +72,7 @@ export default function TestPage({ timing, participant, saveData, updateStatus }
         const newAnswer = {
             questionId: questions[currentIdx].id,
             trustRating,
-            actionIntent,
+            shareIntent,
             responseTimeMs: Date.now() - displayedAt,
             displayOrder: currentIdx,
         };
@@ -159,18 +159,18 @@ export default function TestPage({ timing, participant, saveData, updateStatus }
                 onChange={setTrustRating}
             />
 
-            {/* Q2（Q1との間に24px） */}
+            {/* Q2 */}
             <div style={{ marginTop: '-8px' }}>
                 <LikertScale
-                    id={`action-${timing}-${currentIdx}`}
-                    label="Q2. この投稿の内容に基づいて行動しますか？"
+                    id={`share-${timing}-${currentIdx}`}
+                    label="Q2. この投稿をSNSでシェアしますか？"
                     min={1}
                     max={5}
-                    minLabel="全くしない"
+                    minLabel="絶対しない"
                     maxLabel="必ずする"
                     centerLabel="どちらとも言えない"
-                    value={actionIntent}
-                    onChange={setActionIntent}
+                    value={shareIntent}
+                    onChange={setShareIntent}
                 />
             </div>
 
