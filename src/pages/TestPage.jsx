@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { TEST_SET_A, TEST_SET_B } from '../data/testSets';
+import { TEST_SET_A, TEST_SET_B } from '../data/testSets_v2';
 import LikertScale from '../components/LikertScale';
 import StickyButton from '../components/StickyButton';
 
